@@ -1,12 +1,12 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.SQLite;
 namespace ExotischNLConsoleApp.Data
 {
     internal class ConnectionDB
     {
-        private string connectionString = "Server=tcp:exotischnl-serv.database.windows.net,1433;Initial Catalog=ExotischNL;Persist Security Info=False;User ID=TeamTN;Password=Team1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        internal SqlConnection GetConnection() // Used internal because it protects the method from usage outside this project
+        private string connectionString = "Data Source=C:\\Program Files\\SQLiteStudio\\Exotisch Nederland.db;";
+        internal SQLiteConnection GetConnection()
         {
-            return new SqlConnection(connectionString);
+            return new SQLiteConnection(connectionString);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ExotischNLConsoleApp.Presentation
             while (check) // What is the action you want to perform
             {
                 
-                question = "Wat wilt u doen? (voer een getal in)\n 1. Waarneming registreren.\n 2. Waarneming weegeven.\n 3. Waarneming bewerken (werkt niet).\n 4. Waarneming verwijderen (werkt niet).\n 5. Waarneming goedkeuren.\n 6. Programma afsluiten"; // The question you want to ask
+                question = "Wat wilt u doen? (voer een getal in)\n 1. Waarneming registreren.\n 2. Waarneming weergeven.\n 3. Waarneming bewerken (werkt niet).\n 4. Waarneming verwijderen (werkt niet).\n 5. Waarneming goedkeuren.\n 6. Programma afsluiten"; // The question you want to ask
                 do
                 {
                     string checkResult = InputEmptyCheck(question); // Checks if the input from the user is empty
@@ -114,7 +114,7 @@ namespace ExotischNLConsoleApp.Presentation
             return answer;
         }
 
-        private (string,string) WhatTable() // Asks what table you want to use (WAANREMING or GEVALIDEERDEWAARNEMING)
+        private (string, string) WhatTable() // Asks what table you want to use (WAANREMING or GEVALIDEERDEWAARNEMING)
         {
             int intInput;
             string question;
@@ -129,19 +129,20 @@ namespace ExotischNLConsoleApp.Presentation
             switch (intInput)
             {
                 case 1:
-                    tableName = "dbo.GEVALIDEERDEWAARNEMING";
+                    tableName = "GEVALIDEERDEWAARNEMING";
                     tableIDName = "GWid";
                     return (tableName, tableIDName);
                 case 2:
-                    tableName = "dbo.WAARNEMING";
+                    tableName = "WAARNEMING";
                     tableIDName = "Wid";
-                    return(tableName,tableIDName);
+                    return (tableName, tableIDName);
                 default:
                     Console.WriteLine("Kies 1 of 2");
                     break;
             }
             return (null, null);
         }
+        
 
         private void ChoiceFilterObservations(string tableName, string tableIDName) // Gives choices for the filter
         {
@@ -212,15 +213,15 @@ namespace ExotischNLConsoleApp.Presentation
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 2:
-                        columnName = "dbo.WETENSCHAPPELIJKENAAM.Naam";
+                        columnName = "WETENSCHAPPELIJKENAAM.Naam";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 3:
-                        columnName = "dbo.WETENSCHAPPELIJKENAAM.WetenschappelijkeNaam";
+                        columnName = "WETENSCHAPPELIJKENAAM.WetenschappelijkeNaam";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 4:
-                        columnName = "dbo.SOORT.Soort";
+                        columnName = "SOORT.Soort";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 5:
@@ -228,7 +229,7 @@ namespace ExotischNLConsoleApp.Presentation
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 6:
-                        columnName = "dbo.SOORT.Voorkomen";
+                        columnName = "SOORT.Voorkomen";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 7:
@@ -240,11 +241,11 @@ namespace ExotischNLConsoleApp.Presentation
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 9:
-                        columnName = "dbo.LOCATIE.provincie";
+                        columnName = "LOCATIE.provincie";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     case 10:
-                        columnName = "dbo.LOCATIE.Locatienaam";
+                        columnName = "LOCATIE.Locatienaam";
                         ChoiceSortObservations(columnName, filterOperator, value1, betweenValue2, tableName,tableIDName);
                         break;
                     default:
@@ -326,11 +327,11 @@ namespace ExotischNLConsoleApp.Presentation
                         
                         break;
                     case 2:
-                        columnName2 = "dbo.WETENSCHAPPELIJKENAAM.Naam";
+                        columnName2 = "WETENSCHAPPELIJKENAAM.Naam";
                         _businessMain.DisplayAllObservations(columnName1, filterOperator, betweenValue1, betweenValue2, columnName2, sortingType,tableName);
                         break;
                     case 3:
-                        columnName2 = "dbo.WETENSCHAPPELIJKENAAM.WetenschappelijkeNaam";
+                        columnName2 = "WETENSCHAPPELIJKENAAM.WetenschappelijkeNaam";
                         _businessMain.DisplayAllObservations(columnName1, filterOperator, betweenValue1, betweenValue2, columnName2, sortingType,tableName);
                         break;
                     case 4:
@@ -338,7 +339,7 @@ namespace ExotischNLConsoleApp.Presentation
                         _businessMain.DisplayAllObservations(columnName1, filterOperator, betweenValue1, betweenValue2, columnName2, sortingType,tableName);
                         break;
                     case 5:
-                        columnName2 = "dbo.SOORT.Soort";
+                        columnName2 = "SOORT.Soort";
                         _businessMain.DisplayAllObservations(columnName1, filterOperator, betweenValue1, betweenValue2, columnName2, sortingType,tableName);
                         break;
                     case 6:

@@ -104,9 +104,9 @@ namespace ExotischNLConsoleApp.Business
             InputOrganismType();;
             InputLocation(outWaarnemingRegistreren);
             // INSERT the given data into the database
-            decimal Lid = _dataMain.InsertLocation(location);
-            decimal Sid = _dataMain.InsertType(organismType);
-            decimal WNid = _dataMain.InsertScientificName(scientificName);
+            long Lid = (long)_dataMain.InsertLocation(location);
+            long Sid = (long)_dataMain.InsertType(organismType);
+            long WNid = (long)_dataMain.InsertScientificName(scientificName);
             _dataMain.InsertObservation(WNid, Sid, Lid, observation);
         }
 
