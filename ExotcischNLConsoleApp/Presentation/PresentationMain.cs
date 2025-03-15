@@ -16,7 +16,7 @@ namespace ExotischNLConsoleApp.Presentation
             while (check) // What is the action you want to perform
             {
                 
-                question = "Wat wilt u doen? (voer een getal in)\n 1. Waarneming registreren.\n 2. Waarneming weergeven.\n 3. Waarneming bewerken (werkt niet).\n 4. Waarneming verwijderen (werkt niet).\n 5. Waarneming goedkeuren.\n 6. Programma afsluiten"; // The question you want to ask
+                question = "Wat wilt u doen? (voer een getal in)\n 1. Waarneming registreren.\n 2. Waarneming weergeven.\n 3. Waarneming bewerken.\n 4. Waarneming verwijderen.\n 5. Waarneming goedkeuren.\n 6. Programma afsluiten"; // The question you want to ask
                 do
                 {
                     string checkResult = InputEmptyCheck(question); // Checks if the input from the user is empty
@@ -39,10 +39,10 @@ namespace ExotischNLConsoleApp.Presentation
                         ChoiceFilterObservations(tableName, tableIDName);
                         break;
                     case 3:
-                        // Not implemented yet
+                        _businessMain.UpdateObservation();
                         break;
                     case 4:
-                        // Not implemented yet
+                        _businessMain.DeleteObservation();
                         break;
                     case 5:
                         ApproveObservation();

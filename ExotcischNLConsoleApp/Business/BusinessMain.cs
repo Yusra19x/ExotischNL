@@ -159,6 +159,126 @@ namespace ExotischNLConsoleApp.Business
             _dataMain.ApproveObservation(rowID);
         }
 
+        public void UpdateObservation()
+        {
+            Console.WriteLine("Welke waarneming wil je bewerken? (Kies een tabel)");
+            Console.WriteLine("1. Gevalideerde waarnemingen\n2. Niet-gevalideerde waarnemingen");
+
+            string tableChoice = Console.ReadLine();
+            string tableName;
+            string primaryKey;
+
+            if (tableChoice == "1")
+            {
+                tableName = "GEVALIDEERDEWAARNEMING";
+                primaryKey = "GWid";
+            }
+            else if (tableChoice == "2")
+            {
+                tableName = "WAARNEMING";
+                primaryKey = "Wid";
+            }
+            else
+            {
+                Console.WriteLine("Ongeldige keuze.");
+                return;
+            }
+
+            // Toon de waarnemingen uit de juiste tabel
+            _dataMain.DisplayAllObservations("1=1", "", "", "", $"{tableName}.{primaryKey}", "ASC", tableName);
+
+            Console.Write("Voer de ID in van de waarneming die je wilt bewerken: ");
+            string inputID = Console.ReadLine();
+
+            if (!int.TryParse(inputID, out int rowID))
+            {
+                Console.WriteLine("Ongeldige invoer. Voer een geldig nummer in.");
+                return;
+            }
+
+            Console.WriteLine("Welke eigenschap wil je bewerken? (Kies een nummer)");
+            Console.WriteLine("1. Omschrijving\n2. Aantal\n3. Datum\n4. Tijd\n5. Toelichting");
+
+            string columnName = "";
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    columnName = "Omschrijving";
+                    break;
+                case "2":
+                    columnName = "Aantal";
+                    break;
+                case "3":
+                    columnName = "Datum";
+                    break;
+                case "4":
+                    columnName = "Tijd";
+                    break;
+                case "5":
+                    columnName = "Toelichting";
+                    break;
+                default:
+                    Console.WriteLine("Ongeldige keuze.");
+                    return;
+            }
+
+            Console.Write($"Voer de nieuwe waarde in voor {columnName}: ");
+            string newValue = Console.ReadLine();
+
+            _dataMain.UpdateObservation(rowID, columnName, newValue, tableName);
+        }
+
+        public void DeleteObservation()
+        {
+            Console.WriteLine("Uit welke tabel wil je een waarneming verwijderen?");
+            Console.WriteLine("1. Gevalideerde waarnemingen\n2. Niet-gevalideerde waarnemingen");
+
+            string tableChoice = Console.ReadLine();
+            string tableName;
+            string primaryKey;
+
+            if (tableChoice == "1")
+            {
+                tableName = "GEVALIDEERDEWAARNEMING";
+                primaryKey = "GWid";
+            }
+            else if (tableChoice == "2")
+            {
+                tableName = "WAARNEMING";
+                primaryKey = "Wid";
+            }
+            else
+            {
+                Console.WriteLine("Ongeldige keuze.");
+                return;
+            }
+
+            _dataMain.DisplayAllObservations("1=1", "", "", "", $"{tableName}.{primaryKey}", "ASC", tableName);
+
+            Console.Write("Voer de ID in van de waarneming die je wilt verwijderen: ");
+            string inputID = Console.ReadLine();
+
+            if (!int.TryParse(inputID, out int rowID))
+            {
+                Console.WriteLine("Ongeldige invoer. Voer een geldig nummer in.");
+                return;
+            }
+
+            Console.Write($"Weet je zeker dat je waarneming met ID {rowID} uit {tableName} wilt verwijderen? (j/n): ");
+            string confirm = Console.ReadLine().ToLower();
+
+            if (confirm == "j" || confirm == "ja")
+            {
+                _dataMain.DeleteObservation(rowID, tableName);
+            }
+            else
+            {
+                Console.WriteLine("Verwijderen geannuleerd.");
+            }
+        }
+
         public string CheckValueFilter(int intInput, string filterValue)
         {
             switch(intInput)

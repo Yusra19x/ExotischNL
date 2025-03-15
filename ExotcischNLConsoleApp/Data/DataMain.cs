@@ -37,26 +37,34 @@ namespace ExotischNLConsoleApp.Data
         public void DisplayAllObservations(string columnName1, string filterOperator, string betweenValue1, string betweenValue2, string columnName2, string sortingType, string tableName)
         {
             SQLiteConnection conn = _conn.GetConnection();
-            string displayOrganisms;
+            string primaryKey = (tableName == "GEVALIDEERDEWAARNEMING") ? "GWid" : "Wid"; // Choose 1 or 2
 
-            if (string.IsNullOrWhiteSpace(betweenValue2))
-            {
-                displayOrganisms = $"SELECT * FROM {tableName} WHERE {columnName1}{filterOperator}{betweenValue1} ORDER BY {columnName2} {sortingType}";
-            }
-            else if (string.IsNullOrWhiteSpace(filterOperator) && string.IsNullOrWhiteSpace(betweenValue2))
-            {
-                displayOrganisms = $"SELECT * FROM {tableName} WHERE {columnName1} ORDER BY {columnName2} {sortingType}";
-            }
-            else
-            {
-                displayOrganisms = $"SELECT * FROM {tableName} WHERE {columnName1} {filterOperator} {betweenValue1} {betweenValue2} ORDER BY {columnName2} {sortingType}";
-            }
+            string displayOrganisms = $@"
+            SELECT 
+            {tableName}.{primaryKey} AS ID, 
+            WETENSCHAPPELIJKENAAM.Naam, 
+            {tableName}.Omschrijving, 
+            {tableName}.Aantal, 
+            {tableName}.Datum, 
+            {tableName}.Tijd, 
+            {tableName}.Toelichting 
+            FROM {tableName} 
+            INNER JOIN WETENSCHAPPELIJKENAAM ON {tableName}.WNid = WETENSCHAPPELIJKENAAM.WNid
+            WHERE {columnName1} {filterOperator} {betweenValue1}
+            ORDER BY {columnName2} {sortingType};";
 
             try
             {
                 conn.Open();
                 SQLiteCommand cmd = new SQLiteCommand(displayOrganisms, conn);
                 SQLiteDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    Console.WriteLine("Geen resultaten gevonden.");
+                    return;
+                }
+
                 var table = new ConsoleTable("ID", "Naam", "Omschrijving", "Aantal", "Datum", "Tijd", "Toelichting");
 
                 while (reader.Read())
@@ -66,9 +74,13 @@ namespace ExotischNLConsoleApp.Data
 
                 table.Write();
             }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine($"SQL-fout: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                Console.WriteLine($"{ex.Message}");
+                Console.WriteLine($"Algemene fout: {ex.Message}");
             }
             finally
             {
@@ -265,7 +277,7 @@ namespace ExotischNLConsoleApp.Data
             }
         }
 
-        
+
         public void ApproveObservation(int rowID)
         {
             string selectQuery = "SELECT * FROM WAARNEMING WHERE Wid = @RowID";
@@ -273,15 +285,15 @@ namespace ExotischNLConsoleApp.Data
                                  "VALUES (@Description, @Date, @Time, @WNid, @Sid, @Lid, @Explanation, @Amount, @Sex, @HowSure, @Share)";
             string deleteQuery = "DELETE FROM WAARNEMING WHERE Wid = @RowID";
 
-            
+
             try
-            { 
+            {
                 SQLiteConnection conn_read = _conn.GetConnection();
                 conn_read.Open();
                 SQLiteCommand selectCmd = new SQLiteCommand(selectQuery, conn_read);
                 selectCmd.Parameters.AddWithValue("@RowID", rowID);
                 SQLiteDataReader reader = selectCmd.ExecuteReader();
-                
+
 
                 if (reader.Read())
                 {
@@ -322,7 +334,7 @@ namespace ExotischNLConsoleApp.Data
                     deleteCmd.Parameters.AddWithValue("@RowID", rowID);
                     deleteCmd.ExecuteNonQuery();
                     conn_delete.Close();
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -330,8 +342,106 @@ namespace ExotischNLConsoleApp.Data
             }
             finally
             {
-                
+
+            }
+        }
+
+        public void UpdateObservation(int rowID, string columnName, string newValue, string tableName)
+        {
+            string primaryKey = (tableName == "GEVALIDEERDEWAARNEMING") ? "GWid" : "Wid"; // Kies juiste ID-kolom
+
+            string updateQuery = $"UPDATE {tableName} SET {columnName} = @NewValue WHERE {primaryKey} = @RowID";
+
+            SQLiteConnection conn = _conn.GetConnection();
+
+            try
+            {
+                conn.Open();
+
+                // Controleer of de waarneming bestaat in de juiste tabel
+                string checkQuery = $"SELECT COUNT(*) FROM {tableName} WHERE {primaryKey} = @RowID";
+                SQLiteCommand checkCmd = new SQLiteCommand(checkQuery, conn);
+                checkCmd.Parameters.AddWithValue("@RowID", rowID);
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                if (count == 0)
+                {
+                    Console.WriteLine($"Waarneming met ID {rowID} bestaat niet in {tableName}.");
+                    return;
+                }
+
+                // Voer de update uit
+                SQLiteCommand updateCmd = new SQLiteCommand(updateQuery, conn);
+                updateCmd.Parameters.AddWithValue("@NewValue", newValue);
+                updateCmd.Parameters.AddWithValue("@RowID", rowID);
+                int rowsAffected = updateCmd.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Waarneming met ID {rowID} in {tableName} is succesvol bijgewerkt.");
+                }
+                else
+                {
+                    Console.WriteLine("Er is iets misgegaan, waarneming is niet bijgewerkt.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fout bij bijwerken van waarneming: {ex.Message}");
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        public void DeleteObservation(int rowID, string tableName)
+        {
+            string primaryKey = (tableName == "GEVALIDEERDEWAARNEMING") ? "GWid" : "Wid"; // Choose 1 or 2
+
+            string deleteQuery = $"DELETE FROM {tableName} WHERE {primaryKey} = @RowID";
+
+            SQLiteConnection conn = _conn.GetConnection();
+
+            try
+            {
+                conn.Open();
+
+                // Looking if waarneming is in it
+                string checkQuery = $"SELECT COUNT(*) FROM {tableName} WHERE {primaryKey} = @RowID";
+                SQLiteCommand checkCmd = new SQLiteCommand(checkQuery, conn);
+                checkCmd.Parameters.AddWithValue("@RowID", rowID);
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                if (count == 0)
+                {
+                    Console.WriteLine($"Waarneming met ID {rowID} bestaat niet in {tableName}.");
+                    return;
+                }
+
+                // Removing
+                SQLiteCommand deleteCmd = new SQLiteCommand(deleteQuery, conn);
+                deleteCmd.Parameters.AddWithValue("@RowID", rowID);
+                int rowsAffected = deleteCmd.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Waarneming met ID {rowID} is succesvol verwijderd uit {tableName}.");
+                }
+                else
+                {
+                    Console.WriteLine("Er is iets misgegaan, waarneming is niet verwijderd.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fout bij verwijderen van waarneming: {ex.Message}");
+            }
+            finally
+            {
+                conn.Close();
             }
         }
     }
 }
+
